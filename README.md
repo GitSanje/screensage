@@ -1,6 +1,7 @@
-# screensage
 
-An Electron application with React and TypeScript
+# ScreenSage
+
+**ScreenSage** is an intelligent desktop assistant that continuously captures the user’s screen (or a selected window/region) and uses this visual context to enhance query understanding. When the user asks a question, the system analyzes both the **screen contents** and the **query**, then generates the most relevant, context-aware answer.
 
 ## Recommended IDE Setup
 
