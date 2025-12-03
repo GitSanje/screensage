@@ -1,0 +1,58 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { chatKey } from './use-chat'
+import { useState, useEffect, useRef } from 'react'
+
+
+
+export type CreateChatNewData = Parameters<typeof window.api.ai.new>[0]
+export type ChatNewResponse = Awaited<ReturnType<typeof window.api.ai.new>>
+
+
+export function useCreateNewChat() {
+  const queryClient = useQueryClient()
+  console.log(window.api,'window.api from useAi');
+  
+
+  return useMutation({
+    mutationFn: async (data: CreateChatNewData) => {
+      const result = await window.api.ai.new(data)
+      return result
+    },
+    onSuccess: () => {
+      // Invalidate the chat list cache to refetch the updated list
+      queryClient.invalidateQueries({ queryKey: chatKey })
+    }
+  })
+}
+
+
+export function useAiStreaming(chatId?: number) {
+  const [isStreaming, setIsStreaming] = useState(false)
+  const isAbortedRef = useRef(false)
+
+  useEffect(() => {
+    isAbortedRef.current = false
+
+    const unsubscribe = window.api.ai.onStream((event) => {
+      if (!chatId || event.chatId === chatId) {
+        if (isAbortedRef.current) return
+
+        if (event.chunk.type === 'finish' || event.chunk.type === 'error') {
+          setIsStreaming(false)
+          isAbortedRef.current = false
+        } else if (event.chunk.type === 'text-delta') {
+          setIsStreaming(true)
+        }
+      }
+    })
+    return unsubscribe
+  }, [chatId])
+
+  const abort = async () => {
+    isAbortedRef.current = true
+    setIsStreaming(false)
+    await window.api.ai.abort()
+  }
+
+  return { isStreaming, abort }
+}

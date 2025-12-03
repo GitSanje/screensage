@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Main",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-vite",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-vite.cmd"
+      },
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "ELECTRON_DISABLE_SECURITY_WARNINGS": "true"
+      },
+      "args": [],
+      "runtimeArgs": ["--inspect=9223"],
+      "console": "integratedTerminal",
+      "outputCapture": "std"
+    },
+    {
+      "name": "Debug Renderer",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/src/renderer"
+    },
+    {
+    "name": "Attach Preload",
+    "type": "node",
+    "request": "attach",
+    "port": 9229,
+    "restart": true,
+    "sourceMaps": true,
+    "outFiles": ["${workspaceFolder}/out/preload/**/*.js"]
+}
+
+  ],
+  "compounds": [
+    {
+      "name": "Debug All",
+      "configurations": ["Debug Main", "Debug Renderer"]
+    }
+  ]
+}
